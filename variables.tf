@@ -20,6 +20,11 @@ variable "hostname" {
   description = "Logical hostname; used to derive prefix within S3 bucket"
 }
 
+variable "log_bucket" {
+  default     = ""
+  description = "Log bucket (if overriding module default)"
+}
+
 variable "cloudfront_lambda_origin_request_arn" {
   description = "ARN of Lambda@Edge function to be run for origin request"
 }

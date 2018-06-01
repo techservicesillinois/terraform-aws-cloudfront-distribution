@@ -9,14 +9,13 @@ data "aws_s3_bucket" "selected" {
 }
 
 locals {
-  bucket_arn       = "${data.aws_s3_bucket.selected.arn}"
-  bucket_name      = "${data.aws_s3_bucket.selected.id}"
-  bucket_origin_id = "S3-${data.aws_s3_bucket.selected.id}"
+  bucket_arn         = "${data.aws_s3_bucket.selected.arn}"
+  bucket_name        = "${data.aws_s3_bucket.selected.id}"
+  bucket_origin_id   = "S3-${data.aws_s3_bucket.selected.id}"
+  default_log_bucket = "log-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
 
-  # TODO: Logging bucket name shouldn't be hardcoded and should instead be
-  # retrieved from remote state or some other technique.
-  log_bucket = "log-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
-
+  # User can override log bucket name.
+  log_bucket                  = "${var.log_bucket != "" ? var.log_bucket : local.default_log_bucket}"
   origin_access_identity_path = "${var.origin_access_identity_path}"
   origin_path                 = "${format("%s-%s", substr(md5(var.hostname), 0, 4), var.hostname)}"
 }
