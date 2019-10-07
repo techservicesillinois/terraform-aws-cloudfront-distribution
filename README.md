@@ -1,5 +1,7 @@
 # cloudfront-distribution
 
+[![Build Status](https://drone.techservices.illinois.edu/api/badges/techservicesillinois/terraform-aws-cloudfront-distribution/status.svg)](https://drone.techservices.illinois.edu/techservicesillinois/terraform-aws-cloudfront-distribution)
+
 Provides an CloudFront distribution; currently only supports static content.
 
 Example Usage
