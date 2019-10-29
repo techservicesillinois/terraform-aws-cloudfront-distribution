@@ -14,7 +14,6 @@ module "foo" {
   name = "distributionName"
   aliases = [ "alias1", "alias2", ... "aliasN" ]
   bucket = "bucketName"
-  certificate_arn = "certificateARN" 
   hostname = "virtualHostname"
   origin_access_identity_path" = "oaiPath"
 }
@@ -28,8 +27,7 @@ The following arguments are supported:
 * `name` - (Required) Name of the repository.
 * `aliases` - Aliases (hostnames handled by the distribution).
 * `bucket` - (Required) S3 bucket used for CloudFront origin.
-* `certificate_arn` - (Required for HTTP distributions) ARN of the AWS Certificate Manager certificate for distribution.
-* `enable` - Allow the distribution to accept requests. (Defaults to "true".)
+* `enable` - Allow the distribution to accept requests. (Defaults to true.)
 * `hostname` - (Required) Logical hostname; used to derive prefix within S3 bucket.
 * `cloudfront_lambda_origin_request_arn` - (Required) ARN of Lambda@Edge function to be run for origin request.
 * `log_bucket` - Log bucket. **NOTE**: This is not required, as the built-in default is suitable in most cases.
