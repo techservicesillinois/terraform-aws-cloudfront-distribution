@@ -1,6 +1,7 @@
 variable "aliases" {
-  default     = []
   description = "Aliases (hostnames handled by the distribution)"
+  type        = list(string)
+  default     = []
 }
 
 variable "bucket" {
@@ -12,8 +13,8 @@ variable "certificate_arn" {
 }
 
 variable "enabled" {
-  default     = "true"
   description = "Allow the distribution to accept requests"
+  default     = true
 }
 
 variable "hostname" {
@@ -21,8 +22,8 @@ variable "hostname" {
 }
 
 variable "log_bucket" {
-  default     = ""
   description = "Log bucket (if overriding module default)"
+  default     = ""
 }
 
 variable "cloudfront_lambda_origin_request_arn" {
@@ -34,16 +35,16 @@ variable "origin_access_identity_path" {
 }
 
 variable "default_ttl" {
-  default     = "900"
   description = "Default time to live (in seconds) for object in a CloudFront cache"
+  default     = 900
 }
 
 variable "max_ttl" {
-  default     = "3600"
   description = "Maximum time to live (in seconds) for object in a CloudFront cache"
+  default     = 3600
 }
 
 variable "min_ttl" {
-  default     = "0"
   description = "Minimum time to live (in seconds) for object in a CloudFront cache"
+  default     = 0
 }
