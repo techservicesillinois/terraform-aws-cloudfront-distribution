@@ -1,5 +1,6 @@
+.PHONY: test clean
 
-all: .terraform
+test: .terraform
 	AWS_DEFAULT_REGION=us-east-2 terraform validate
 	terraform fmt -check
 	! grep -l TF-UPGRADE-TODO *.tf
