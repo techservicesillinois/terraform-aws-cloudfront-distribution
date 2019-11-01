@@ -6,10 +6,7 @@ variable "aliases" {
 
 variable "bucket" {
   description = "S3 bucket used for this CloudFront origin"
-}
-
-variable "certificate_arn" {
-  description = "ARN of the AWS Certificate Manager certificate for distribution"
+  default     = ""
 }
 
 variable "enabled" {

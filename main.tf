@@ -1,9 +1,23 @@
+# Additional provider needed because certificates reside in us-east-1.
+
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+}
+
 # Data sources are used to retrieve account number and region.
 
 data "aws_caller_identity" "current" {
 }
 
 data "aws_region" "current" {
+}
+
+data "aws_acm_certificate" "selected" {
+  provider    = "aws.us-east-1"
+  domain      = var.hostname
+  statuses    = ["ISSUED"]
+  most_recent = true
 }
 
 data "aws_s3_bucket" "selected" {
@@ -38,13 +52,13 @@ resource "aws_cloudfront_distribution" "default" {
   aliases             = compact(concat([var.hostname], var.aliases))
   comment             = var.hostname
   enabled             = var.enabled
-  is_ipv6_enabled     = "true"
+  is_ipv6_enabled     = true
   default_root_object = "index.html"
   price_class         = "PriceClass_All"
-  retain_on_delete    = "false"
+  retain_on_delete    = false
 
   logging_config {
-    include_cookies = "false"
+    include_cookies = false
     bucket          = "${local.log_bucket}.s3.amazonaws.com"
     prefix          = "cloudfront/${var.hostname}/"
   }
@@ -55,7 +69,7 @@ resource "aws_cloudfront_distribution" "default" {
     target_origin_id = local.bucket_origin_id
 
     forwarded_values {
-      query_string = "false"
+      query_string = false
 
       cookies {
         forward = "none"
@@ -80,7 +94,7 @@ resource "aws_cloudfront_distribution" "default" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = var.certificate_arn
+    acm_certificate_arn      = data.aws_acm_certificate.selected.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1"
   }
