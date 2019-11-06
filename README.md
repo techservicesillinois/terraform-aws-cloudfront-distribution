@@ -2,7 +2,14 @@
 
 [![Build Status](https://drone.techservices.illinois.edu/api/badges/techservicesillinois/terraform-aws-cloudfront-distribution/status.svg)](https://drone.techservices.illinois.edu/techservicesillinois/terraform-aws-cloudfront-distribution)
 
-Provides an CloudFront distribution; currently only supports static content.
+Provides a CloudFront distribution. This module expects all content
+for the distribution to reside in an S3 bucket at a prefix determined
+by the user supplied hostname and domain. The prefix is the FQDN
+prepended with the first four digits of the md5sum of the FQDN.
+This is done for [performance
+reasons](https://aws.amazon.com/blogs/aws/amazon-s3-performance-tips-tricks-seattle-hiring-event/).
+By default a Route 53 alias for the hostname is created in the zone
+determined by the user supplied domain.
 
 Example Usage
 -----------------
@@ -11,12 +18,15 @@ Example Usage
 module "foo" {
   source = "git@github.com:techservicesillinois/terraform-aws-cloudfront-distribution"
 
-  name = "distributionName"
-  aliases = [ "alias1", "alias2", ... "aliasN" ]
-  bucket = "bucketName"
-  hostname = "virtualHostname"
-  origin_access_identity_path" = "oaiPath"
-}
+  hostname = "www"
+  domain = "foo.com"
+
+  aliases = [ "www.bar.com", "bar.com", ... "foo.com" ]
+
+  bucket = "some-S3-bucket"
+  origin_access_identity_path = "origin-access-identity/cloudfront/QA0DOUCO4WRZ2"
+
+  cloudfront_lambda_origin_request_arn = "arn:aws:lambda:us-east-1:617683844790:function:cloudfront-directory-index:1"
 ```
 
 Argument Reference
@@ -24,26 +34,28 @@ Argument Reference
 
 The following arguments are supported:
 
-* `name` - (Required) Name of the repository.
-* `aliases` - Aliases (hostnames handled by the distribution).
-* `bucket` - (Required) S3 bucket used for CloudFront origin.
-* `enable` - Allow the distribution to accept requests. (Defaults to true.)
-* `hostname` - (Required) Logical hostname; used to derive prefix within S3 bucket.
+* `hostname` - (Required) The primary hostname used in the S3 prefix, to create Route 53 records, and ACM certificates. 
+* `domain` - (Required) The primary domain used in the S3 prefix, to create Route 53 records, and ACM certificates.
+* `bucket` - (Required) S3 bucket used as the CloudFront origin.
+* `origin_access_identity_path` - (Required) CloudFront origin access identity for the S3 bucket.
 * `cloudfront_lambda_origin_request_arn` - (Required) ARN of Lambda@Edge function to be run for origin request.
-* `log_bucket` - Log bucket. **NOTE**: This is not required, as the built-in default is suitable in most cases.
-* `origin_access_identity_path` - (Required) CloudFront origin access identity for this origin.
-* `default_ttl` - Default time to live (in seconds) for object in a CloudFront cache.
-* `max_ttl` - "Maximum time to live (in seconds) for object in a CloudFront cache.
-* `min_ttl` - "Minimum time to live (in seconds) for object in a CloudFront cache.
+* `aliases` - Extra hostnames handled by the distribution
+* `create_route53_record` - If false, do not create a Route53 alias for the `hostname` in `domain` (Defaults to true).
+* `enabled` - Allow the distribution to accept requests. (Defaults to true).
+* `log_bucket` - Log bucket (Default is log-region-account)
+* `default_ttl` - Default time to live (in seconds) for object in a CloudFront cache (Default 900).
+* `max_ttl` - "Maximum time to live (in seconds) for object in a CloudFront cache (Default 3600)
+* `min_ttl` - "Minimum time to live (in seconds) for object in a CloudFront cache (Default 0).
 
 Attributes Reference
 --------------------
 
 The following attributes are exported:
 
+* `cert_arn` - ACM certificate attached to the CloudFront distribution.
 * `cloudfront_domain_name` - Full domain name of CloudFront distribution.
 * `log_bucket` - Name of log bucket used for distribution.
-* `s3_prefix` - Prefix of this distribution within the hosting S3 bucket.
+* `s3_prefix` - Prefix of this distribution within the origin S3 bucket.
 
 Credits
 --------------------

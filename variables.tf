@@ -1,26 +1,16 @@
-variable "aliases" {
-  description = "Aliases (hostnames handled by the distribution)"
-  type        = list(string)
-  default     = []
+# Required
+
+variable "hostname" {
+  description = "The primary hostname used in the S3 prefix, to create Route 53 records, and ACM certificates."
+}
+
+variable "domain" {
+  description = "The primary domain used in the S3 prefix, to create Route 53 records, and ACM certificates."
 }
 
 variable "bucket" {
-  description = "S3 bucket used for this CloudFront origin"
-  default     = ""
-}
-
-variable "enabled" {
-  description = "Allow the distribution to accept requests"
-  default     = true
-}
-
-variable "hostname" {
-  description = "Logical hostname; used to derive prefix within S3 bucket"
-}
-
-variable "log_bucket" {
-  description = "Log bucket (if overriding module default)"
-  default     = ""
+  description = "S3 bucket used as the CloudFront origin"
+  type        = string
 }
 
 variable "cloudfront_lambda_origin_request_arn" {
@@ -29,6 +19,28 @@ variable "cloudfront_lambda_origin_request_arn" {
 
 variable "origin_access_identity_path" {
   description = "CloudFront origin access identity for this origin"
+}
+
+# Optional
+
+variable "aliases" {
+  description = "Extra hostnames handled by the distribution"
+  type        = list(string)
+  default     = []
+}
+
+variable "create_route53_record" {
+  description = "If false, do not create Route53 alias"
+  default     = true
+}
+variable "enabled" {
+  description = "Allow the distribution to accept requests"
+  default     = true
+}
+
+variable "log_bucket" {
+  description = "Log bucket (Default is log-region-account)"
+  default     = ""
 }
 
 variable "default_ttl" {
