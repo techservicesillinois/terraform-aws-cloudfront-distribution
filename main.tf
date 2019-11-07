@@ -1,39 +1,14 @@
-# Additional provider needed because certificates reside in us-east-1.
-
-provider "aws" {
-  alias  = "us-east-1"
-  region = "us-east-1"
-}
-
-# Data sources are used to retrieve account number and region.
-
-data "aws_caller_identity" "current" {
-}
-
-data "aws_region" "current" {
-}
-
-data "aws_acm_certificate" "selected" {
-  provider    = "aws.us-east-1"
-  domain      = var.hostname
-  statuses    = ["ISSUED"]
-  most_recent = true
-}
-
-data "aws_s3_bucket" "selected" {
-  bucket = var.bucket
-}
-
 locals {
   bucket_arn         = data.aws_s3_bucket.selected.arn
   bucket_name        = data.aws_s3_bucket.selected.id
   bucket_origin_id   = "S3-${data.aws_s3_bucket.selected.id}"
   default_log_bucket = "log-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
+  fqdn               = "${var.hostname}.${var.domain}"
 
   # User can override log bucket name.
   log_bucket                  = var.log_bucket != "" ? var.log_bucket : local.default_log_bucket
   origin_access_identity_path = var.origin_access_identity_path
-  origin_path                 = format("%s-%s", substr(md5(var.hostname), 0, 4), var.hostname)
+  origin_path                 = format("%s-%s", substr(md5(local.fqdn), 0, 4), local.fqdn)
 }
 
 # Cloudfront distribution.
@@ -49,8 +24,8 @@ resource "aws_cloudfront_distribution" "default" {
     }
   }
 
-  aliases             = compact(concat([var.hostname], var.aliases))
-  comment             = var.hostname
+  aliases             = compact(concat([local.fqdn], var.aliases))
+  comment             = local.fqdn
   enabled             = var.enabled
   is_ipv6_enabled     = true
   default_root_object = "index.html"
@@ -60,7 +35,7 @@ resource "aws_cloudfront_distribution" "default" {
   logging_config {
     include_cookies = false
     bucket          = "${local.log_bucket}.s3.amazonaws.com"
-    prefix          = "cloudfront/${var.hostname}/"
+    prefix          = "cloudfront/${local.fqdn}/"
   }
 
   default_cache_behavior {
