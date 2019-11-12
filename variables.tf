@@ -33,6 +33,12 @@ variable "create_route53_record" {
   description = "If false, do not create Route53 alias"
   default     = true
 }
+
+variable "create_acm_cert" {
+  description = "If false, do not create ACM cert"
+  default     = true
+}
+
 variable "enabled" {
   description = "Allow the distribution to accept requests"
   default     = true
