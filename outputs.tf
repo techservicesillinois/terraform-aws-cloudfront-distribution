@@ -1,6 +1,6 @@
 output "cert_arn" {
   description = "ACM certificate attached to the CloudFront distribution"
-  value       = data.aws_acm_certificate.selected.arn
+  value       = local.acm_cert_arn
 }
 
 output "cloudfront_domain_name" {
