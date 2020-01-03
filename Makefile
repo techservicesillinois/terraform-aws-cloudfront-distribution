@@ -28,7 +28,7 @@ test: .terraform
 	! grep 'source\s*=.*\.git.*"' *.tf README.md
 
 # Launches the Makefile inside a container
-docker: 
+docker:
 	docker build . -t test/$(REPO)
 	docker run --rm test/$(REPO)
 

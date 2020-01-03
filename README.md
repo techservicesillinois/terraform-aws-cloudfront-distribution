@@ -14,6 +14,8 @@ are created in the zone determined by the user supplied domain.
 Example Usage
 -----------------
 
+### www.foo.com in zone foo.com
+
 ```hcl
 module "foo" {
   source = "git@github.com:techservicesillinois/terraform-aws-cloudfront-distribution"
@@ -29,12 +31,26 @@ module "foo" {
   cloudfront_lambda_origin_request_arn = "arn:aws:lambda:us-east-1:617683844790:function:cloudfront-directory-index:1"
 ```
 
+### www.foo.com in zone www.foo.com
+
+```hcl
+module "foo" {
+  source = "git@github.com:techservicesillinois/terraform-aws-cloudfront-distribution"
+
+  domain = "www.foo.com"
+
+  bucket = "some-S3-bucket"
+  origin_access_identity_path = "origin-access-identity/cloudfront/QA0DOUCO4WRZ2"
+
+  cloudfront_lambda_origin_request_arn = "arn:aws:lambda:us-east-1:617683844790:function:cloudfront-directory-index:1"
+```
+
 Argument Reference
 -----------------
 
 The following arguments are supported:
 
-* `hostname` - (Required) The primary hostname used in the S3 prefix, to create a Route 53 record, and ACM certificate.
+* `hostname` - (Optional) The primary hostname used in the S3 prefix, to create a Route 53 record, and ACM certificate.
 * `domain` - (Required) The primary domain used in the S3 prefix, to create a Route 53 record, and ACM certificate.
 * `bucket` - (Required) S3 bucket used as the CloudFront origin.
 * `origin_access_identity_path` - (Required) CloudFront origin access identity for the S3 bucket.

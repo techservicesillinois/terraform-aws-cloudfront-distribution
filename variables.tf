@@ -2,6 +2,7 @@
 
 variable "hostname" {
   description = "The primary hostname used in the S3 prefix, to create Route 53 records, and ACM certificates."
+  default     = ""
 }
 
 variable "domain" {

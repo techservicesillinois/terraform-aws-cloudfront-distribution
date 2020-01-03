@@ -3,7 +3,7 @@ locals {
   bucket_name        = data.aws_s3_bucket.selected.id
   bucket_origin_id   = "S3-${data.aws_s3_bucket.selected.id}"
   default_log_bucket = "log-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
-  fqdn               = "${var.hostname}.${var.domain}"
+  fqdn               = length(var.hostname) > 0 ? "${var.hostname}.${var.domain}" : "${var.domain}"
 
   # User can override log bucket name.
   log_bucket                  = var.log_bucket != "" ? var.log_bucket : local.default_log_bucket
