@@ -51,9 +51,22 @@ resource "aws_cloudfront_distribution" "default" {
       }
     }
 
-    lambda_function_association {
-      event_type = "origin-request"
-      lambda_arn = var.cloudfront_lambda_origin_request_arn
+    dynamic "lambda_function_association" {
+      for_each = toset(var.lambda_function_association)
+      iterator = each
+
+      content {
+        event_type = lookup(each.value, "event_type")
+        lambda_arn = format("%s:%s",
+          data.aws_lambda_function.selected[
+            lookup(each.value, "name")
+          ].arn,
+          data.aws_lambda_function.selected[
+            lookup(each.value, "name")
+          ].version
+        )
+        include_body = lookup(each.value, "include_body", null)
+      }
     }
 
     viewer_protocol_policy = "redirect-to-https"

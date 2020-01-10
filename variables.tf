@@ -14,8 +14,10 @@ variable "bucket" {
   type        = string
 }
 
-variable "cloudfront_lambda_origin_request_arn" {
-  description = "ARN of Lambda@Edge function to be run for origin request"
+variable "lambda_function_association" {
+  description = "A config block that triggers a lambda function with specific actions"
+  type        = list(map(string))
+  default     = []
 }
 
 variable "origin_access_identity_path" {

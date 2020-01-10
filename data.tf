@@ -14,3 +14,15 @@ data "aws_region" "current" {}
 data "aws_s3_bucket" "selected" {
   bucket = var.bucket
 }
+
+data "aws_lambda_function" "selected" {
+  for_each = {
+    for fun in var.lambda_function_association :
+    fun["name"] => fun
+  }
+
+  provider = aws.us-east-1
+
+  function_name = each.key
+  qualifier     = lookup(each.value, "version", null)
+}
