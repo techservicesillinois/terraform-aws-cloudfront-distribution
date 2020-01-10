@@ -28,7 +28,13 @@ module "foo" {
   bucket = "some-S3-bucket"
   origin_access_identity_path = "origin-access-identity/cloudfront/QA0DOUCO4WRZ2"
 
-  cloudfront_lambda_origin_request_arn = "arn:aws:lambda:us-east-1:617683844790:function:cloudfront-directory-index:1"
+  lambda_function_association = [
+    {
+      name = "cloudfront-directory-index",
+      version = "latest"
+      event_type = "origin-request"
+    }
+  ]
 ```
 
 ### www.foo.com in zone www.foo.com
@@ -42,7 +48,13 @@ module "foo" {
   bucket = "some-S3-bucket"
   origin_access_identity_path = "origin-access-identity/cloudfront/QA0DOUCO4WRZ2"
 
-  cloudfront_lambda_origin_request_arn = "arn:aws:lambda:us-east-1:617683844790:function:cloudfront-directory-index:1"
+  lambda_function_association = [
+    {
+      name = "cloudfront-directory-index",
+      version = 4
+      event_type = "origin-request"
+    }
+  ]
 ```
 
 Argument Reference
@@ -54,7 +66,9 @@ The following arguments are supported:
 * `domain` - (Required) The primary domain used in the S3 prefix, to create a Route 53 record, and ACM certificate.
 * `bucket` - (Required) S3 bucket used as the CloudFront origin.
 * `origin_access_identity_path` - (Required) CloudFront origin access identity for the S3 bucket.
-* `cloudfront_lambda_origin_request_arn` - (Required) ARN of Lambda@Edge function to be run for origin request.
+* `lambda_function_association` - A
+[lambda_function_association](#lambda_function_association) block
+triggers a lambda function with specific actions.
 * `aliases` - Extra hostnames handled by the distribution
 * `create_route53_record` - If false, do not create a Route53 alias for the `hostname` in `domain` (Defaults to true).
 * `create_acm_cert` - If false, do not create an ACM certificate for the `hostname` and `aliases` in `domain` (Defaults to true).
@@ -63,6 +77,31 @@ The following arguments are supported:
 * `default_ttl` - Default time to live (in seconds) for object in a CloudFront cache (Default 900).
 * `max_ttl` - "Maximum time to live (in seconds) for object in a CloudFront cache (Default 3600)
 * `min_ttl` - "Minimum time to live (in seconds) for object in a CloudFront cache (Default 0).
+
+
+lambda_function_association
+---------------------------
+
+A `lambda_function_association` block supports the following:
+
+* `event_type` - (Required) The specific
+[event](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-cloudfront-trigger-events.html)
+to trigger this function. Valid values: `viewer-request`,
+`origin-request`, `viewer-response`, `origin-response`.
+
+* `name` - (Required) Name of the lambda function.
+
+* `version` - (Optional) Alias name or version number of the lambda
+function.
+
+* `include_body` - (Optional) When set to true it exposes the request
+body to the lambda function (Default: `false`)
+
+Lambda@Edge allows you to associate an AWS Lambda Function with a
+predefined event. You can associate a single function per event
+type. See
+[What is Lambda@Edge](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html)
+for more information.
 
 Attributes Reference
 --------------------

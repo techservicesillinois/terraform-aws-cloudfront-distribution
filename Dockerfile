@@ -5,4 +5,4 @@ RUN apk add make
 WORKDIR /tmp
 COPY . /tmp
 
-ENTRYPOINT [ "/usr/bin/make" ]
+ENTRYPOINT [ "/usr/bin/make", "tfc" ]
