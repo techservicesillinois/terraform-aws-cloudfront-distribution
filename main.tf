@@ -52,11 +52,11 @@ resource "aws_cloudfront_distribution" "default" {
     }
 
     dynamic "lambda_function_association" {
-      for_each = toset(var.lambda_function_association)
+      for_each = var.lambda_function_association
       iterator = each
 
       content {
-        event_type = lookup(each.value, "event_type")
+        event_type = each.key
         lambda_arn = format("%s:%s",
           data.aws_lambda_function.selected[
             lookup(each.value, "name")

@@ -16,8 +16,8 @@ variable "bucket" {
 
 variable "lambda_function_association" {
   description = "A config block that triggers a lambda function with specific actions"
-  type        = list(map(string))
-  default     = []
+  type        = map(map(string))
+  default     = {}
 }
 
 variable "origin_access_identity_path" {
