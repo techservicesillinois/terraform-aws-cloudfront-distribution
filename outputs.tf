@@ -1,3 +1,8 @@
+output "id" {
+  description = "The identifier for the distribution"
+  value       = aws_cloudfront_distribution.default.id
+}
+
 output "cert_arn" {
   description = "ACM certificate attached to the CloudFront distribution"
   value       = local.acm_cert_arn

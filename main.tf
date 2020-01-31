@@ -9,6 +9,15 @@ locals {
   log_bucket                  = var.log_bucket != "" ? var.log_bucket : local.default_log_bucket
   origin_access_identity_path = var.origin_access_identity_path
   origin_path                 = format("%s-%s", substr(md5(local.fqdn), 0, 4), local.fqdn)
+
+  basic_auth = { viewer-request = { name = "cloudfront-basic-auth", version = "latest" } }
+  redirect   = { origin-request = { name = "cloudfront-directory-index", version = "latest" } }
+
+  lambda_function_association = var.redirect && length(var.basic_auth) > 0 ? merge(
+    local.basic_auth, local.redirect, var.lambda_function_association
+    ) : var.redirect ? merge(local.redirect, var.lambda_function_association
+    ) : length(var.basic_auth) > 0 ? merge(local.basic_auth, var.lambda_function_association
+  ) : var.lambda_function_association
 }
 
 # Cloudfront distribution.
@@ -51,9 +60,22 @@ resource "aws_cloudfront_distribution" "default" {
       }
     }
 
-    lambda_function_association {
-      event_type = "origin-request"
-      lambda_arn = var.cloudfront_lambda_origin_request_arn
+    dynamic "lambda_function_association" {
+      for_each = local.lambda_function_association
+      iterator = each
+
+      content {
+        event_type = each.key
+        lambda_arn = format("%s:%s",
+          data.aws_lambda_function.selected[
+            lookup(each.value, "name")
+          ].arn,
+          data.aws_lambda_function.selected[
+            lookup(each.value, "name")
+          ].version
+        )
+        include_body = lookup(each.value, "include_body", null)
+      }
     }
 
     viewer_protocol_policy = "redirect-to-https"
@@ -64,7 +86,8 @@ resource "aws_cloudfront_distribution" "default" {
 
   restrictions {
     geo_restriction {
-      restriction_type = "none"
+      locations        = lookup(var.geo_restriction, "locations")
+      restriction_type = lookup(var.geo_restriction, "restriction_type")
     }
   }
 
