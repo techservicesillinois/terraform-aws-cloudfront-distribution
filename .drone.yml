@@ -3,4 +3,4 @@ pipeline:
     image: hashicorp/terraform
     commands:
       - apk add make
-      - make
+      - make tfc
