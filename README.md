@@ -124,6 +124,7 @@ basic_auth
 A `basic_auth` block supports the following:
 
 * `regions` - A list of AWS region names where to create DynamoDB tables.
+* `policy_name` - (Optional) The name of the DynamoDB IAM policy.
 
 If configured the module will create global DynamodDB tables named
 `CloudFront-Basic-Auth-DistributionID` in the regions specified.
