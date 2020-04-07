@@ -28,7 +28,7 @@ variable "aliases" {
 
 variable "basic_auth" {
   description = "HTTP basic authentication block"
-  type        = map(list(string))
+  type        = any
   default     = {}
 }
 

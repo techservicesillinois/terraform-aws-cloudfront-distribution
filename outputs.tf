@@ -22,3 +22,8 @@ output "s3_prefix" {
   description = "Prefix of this distribution within the origin S3 bucket"
   value       = local.origin_path
 }
+
+output "policy_arn" {
+  description = "DynamoDB admin policy ARN"
+  value       = module.basic-auth.policy_arn
+}
