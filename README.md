@@ -180,6 +180,7 @@ The following attributes are exported:
 
 * `cert_arn` - ACM certificate attached to the CloudFront distribution.
 * `cloudfront_domain_name` - Full domain name of CloudFront distribution.
+* `dynamodb_table_name` - Name of the DynamoDB table holding credentials for HTTP basic authentication.
 * `log_bucket` - Name of log bucket used for distribution.
 * `s3_prefix` - Prefix of this distribution within the origin S3 bucket.
 
