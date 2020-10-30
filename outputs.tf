@@ -30,5 +30,5 @@ output "policy_arn" {
 
 output "dynamodb_table_name" {
   description = "DynamoDB table name"
-  value       = module.basic-auth.dynamodb_table[0].name
+  value       = module.basic-auth.dynamodb_table != null ? module.basic-auth.dynamodb_table.name : null
 }
