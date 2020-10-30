@@ -3,5 +3,5 @@ output "policy_arn" {
 }
 
 output "dynamodb_table" {
-  value = length(var.regions) > 0 ? aws_dynamodb_global_table.default : null
+  value = length(var.regions) > 0 ? aws_dynamodb_global_table.default[0] : null
 }
