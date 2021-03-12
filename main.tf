@@ -1,14 +1,22 @@
+# Get S3 prefix for CloudFront distribution.
+
+module "s3-prefix" {
+  source = "git@github.com:techservicesillinois/terraform-aws-util//modules/compute-s3-prefix?ref=v3.0.0"
+
+  fqdn = local.fqdn
+}
+
 locals {
   bucket_arn         = data.aws_s3_bucket.selected.arn
   bucket_name        = data.aws_s3_bucket.selected.id
   bucket_origin_id   = "S3-${data.aws_s3_bucket.selected.id}"
   default_log_bucket = "log-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
-  fqdn               = length(var.hostname) > 0 ? "${var.hostname}.${var.domain}" : "${var.domain}"
+  fqdn               = length(var.hostname) > 0 ? format("%s.%s", var.hostname, var.domain) : var.domain
 
   # User can override log bucket name.
   log_bucket                  = var.log_bucket != "" ? var.log_bucket : local.default_log_bucket
   origin_access_identity_path = var.origin_access_identity_path
-  origin_path                 = format("%s-%s", substr(md5(local.fqdn), 0, 4), local.fqdn)
+  origin_path                 = module.s3-prefix.prefix
 
   basic_auth = { viewer-request = { name = "cloudfront-basic-auth", version = "latest" } }
   redirect   = { origin-request = { name = "cloudfront-directory-index", version = "latest" } }

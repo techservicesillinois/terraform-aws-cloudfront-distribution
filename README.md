@@ -1,6 +1,6 @@
 # cloudfront-distribution
 
-[![Build Status](https://drone.techservices.illinois.edu/api/badges/techservicesillinois/terraform-aws-cloudfront-distribution/status.svg)](https://drone.techservices.illinois.edu/techservicesillinois/terraform-aws-cloudfront-distribution)
+[![Terraform actions status](https://github.com/techservicesillinois/terraform-aws-cloudfront-distribution/workflows/terraform/badge.svg)](https://github.com/techservicesillinois/terraform-aws-cloudfront-distribution/actions)
 
 Provides a CloudFront distribution for static content. This module
 expects all content for the distribution to reside in an S3 bucket
