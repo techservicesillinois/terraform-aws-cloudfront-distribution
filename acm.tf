@@ -28,15 +28,19 @@ resource "aws_acm_certificate" "default" {
 }
 
 resource "aws_route53_record" "acm" {
-  count = local.create_acm_cert ? length(var.aliases) + 1 : 0
+  for_each = {
+    for dvo in aws_acm_certificate.default[0].domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
 
-  provider = aws.us-east-1
-
-  name    = aws_acm_certificate.default[0].domain_validation_options[count.index]["resource_record_name"]
-  type    = aws_acm_certificate.default[0].domain_validation_options[count.index]["resource_record_type"]
-  zone_id = data.aws_route53_zone.selected[0].zone_id
+  name    = each.value.name
+  records = [each.value.record]
   ttl     = 60
-  records = [aws_acm_certificate.default[0].domain_validation_options[count.index]["resource_record_value"]]
+  type    = each.value.type
+  zone_id = data.aws_route53_zone.selected[0].zone_id
 }
 
 resource "aws_acm_certificate_validation" "default" {
@@ -45,5 +49,5 @@ resource "aws_acm_certificate_validation" "default" {
   provider = aws.us-east-1
 
   certificate_arn         = aws_acm_certificate.default[0].arn
-  validation_record_fqdns = aws_route53_record.acm.*.fqdn
+  validation_record_fqdns = [for r in aws_route53_record.acm : r.fqdn]
 }
