@@ -1,7 +1,8 @@
 # Get S3 prefix for CloudFront distribution.
 
 module "s3-prefix" {
-  source = "git@github.com:techservicesillinois/terraform-aws-util//modules/compute-s3-prefix?ref=v3.0.0"
+  # NOTE: Use canonical GitHub URL to make GitHub Actions happy.
+  source = "github.com/techservicesillinois/terraform-aws-util//modules/compute-s3-prefix?ref=v3.0.2"
 
   fqdn = local.fqdn
 }
