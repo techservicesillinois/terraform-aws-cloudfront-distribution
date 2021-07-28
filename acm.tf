@@ -29,7 +29,7 @@ resource "aws_acm_certificate" "default" {
 
 resource "aws_route53_record" "acm" {
   for_each = {
-    for dvo in(local.create_acm_cert ? aws_acm_certificate.default[0].domain_validation_options : {}) : dvo.domain_name => {
+    for dvo in (local.create_acm_cert ? aws_acm_certificate.default[0].domain_validation_options : toset()) : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
