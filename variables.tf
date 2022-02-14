@@ -86,3 +86,9 @@ variable "redirect" {
   description = "Enables appending index.html to requests ending in a slash (Default true)"
   default     = true
 }
+
+variable "tags" {
+  description = "A map of tags to assign to the bucket"
+  type        = map(string)
+  default     = {}
+}

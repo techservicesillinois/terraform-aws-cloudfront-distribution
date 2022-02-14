@@ -1,16 +1,12 @@
-OBJS := main.tf providers.tf tables.tf
+REGIONS := regions.tf.json
+PHONY   := .regions
 
-all: $(OBJS)
+all: $(REGIONS)
 
-.describe-regions:
-	aws --output json ec2 describe-regions > .describe-regions
+.regions:
+	aws --output json ec2 describe-regions | ./make-regions > $(REGIONS)
 
-.regions: .describe-regions
-	grep '"RegionName":' .describe-regions | sed 's/^[^:]*: "//;s/",//' | \
-    sort | tr '\n' ',' | sed 's/,$$//;s/,/, /g' > $@
-
-%.tf: %.m4 .regions
-	m4 -DREGIONS="$(shell cat .regions)" $< > $@
+$(REGIONS): .regions
 
 clean:
-	rm -f $(OBJS) .regions .describe-regions
+	rm -f $(REGIONS) .regions

@@ -1,7 +1,3 @@
-data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
-
 locals {
   account_id = data.aws_caller_identity.current.account_id
   region     = data.aws_region.current.name
@@ -20,7 +16,7 @@ data "aws_iam_policy_document" "default" {
       "dynamodb:UpdateItem",
     ]
 
-    resources = ["arn:aws:dynamodb:${local.region}:${local.account_id}:table/${aws_dynamodb_global_table.default[0].name}"]
+    resources = ["arn:aws:dynamodb:${local.region}:${local.account_id}:table/${aws_dynamodb_table.default.name}"]
   }
 }
 
@@ -30,7 +26,7 @@ resource "aws_iam_policy" "default" {
   name = var.policy_name
   path = "/"
 
-  description = "Policy used to manage DynamoDB table ${aws_dynamodb_global_table.default[0].name}"
+  description = "Policy for DynamoDB table ${aws_dynamodb_table.default.name}"
 
   policy = data.aws_iam_policy_document.default[0].json
 }
