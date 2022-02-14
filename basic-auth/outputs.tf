@@ -3,5 +3,13 @@ output "policy_arn" {
 }
 
 output "dynamodb_table" {
-  value = length(var.regions) > 0 ? aws_dynamodb_global_table.default[0] : null
+  value = length(var.regions) > 0 ? aws_dynamodb_table.default : null
+}
+
+output "known_regions" {
+  value = local.known_regions
+}
+
+output "replica_regions" {
+  value = local.replica_regions
 }

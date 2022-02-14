@@ -1,7 +1,14 @@
 variable "name" {}
 
+variable "policy_name" {}
+
 variable "regions" {
-  type = list(string)
+  description = "Regions in which replicas should be created"
+  type        = list(string)
 }
 
-variable "policy_name" {}
+variable "tags" {
+  description = "A map of tags to assign to the bucket"
+  type        = map(string)
+  default     = {}
+}

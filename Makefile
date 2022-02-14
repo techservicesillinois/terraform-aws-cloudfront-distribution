@@ -13,6 +13,7 @@ all: tfc test
 tfc: .terraform
 	@# Basic Terraform validation and formating checks
 	terraform version
+	terraform init -backend=false
 	terraform validate
 	terraform fmt -check -recursive
 

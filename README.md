@@ -8,6 +8,7 @@ at a prefix determined by the user supplied hostname and domain.
 The prefix is the FQDN (*hostname.domain*) prepended with the first
 four digits of the md5sum of the FQDN.  This is done for [performance
 reasons](https://aws.amazon.com/blogs/aws/amazon-s3-performance-tips-tricks-seattle-hiring-event/).
+
 By default an ACM certificate and Route 53 alias for the hostname
 are created in the zone determined by the user supplied domain. In
 addition, requests ending in slash are redirected
@@ -29,11 +30,10 @@ module "foo" {
   source = "git@github.com:techservicesillinois/terraform-aws-cloudfront-distribution"
 
   hostname = "www"
-  domain = "foo.com"
+  domain   = "foo.com"
 
-  aliases = [ "static.foo.com", "bar.foo.com", ... "foo.com" ]
-
-  bucket = "some-S3-bucket"
+  aliases                     = [ "static.foo.com", "bar.foo.com", ... "foo.com" ]
+  bucket                      = "some-S3-bucket"
   origin_access_identity_path = "origin-access-identity/cloudfront/QA0DOUCO4WRZ2"
 }
 ```
@@ -47,14 +47,13 @@ not specify a hostname.
 module "foo" {
   source = "git@github.com:techservicesillinois/terraform-aws-cloudfront-distribution"
 
-  domain = "www.foo.com"
-
-  bucket = "some-S3-bucket"
+  domain                      = "www.foo.com"
+  bucket                      = "some-S3-bucket"
   origin_access_identity_path = "origin-access-identity/cloudfront/QA0DOUCO4WRZ2"
 
   lambda_function_association = {
     origin-request = {
-      name = "cloudfront-directory-index",
+      name    = "cloudfront-directory-index",
       version = 4
     }
   }
@@ -65,22 +64,28 @@ module "foo" {
 
 This example creates a distribution that is password protected with
 [HTTP basic authentication](https://tools.ietf.org/html/rfc7617).
-The username and passwords are stored in DynamoDB tables in the
-regions specified (i.e. `us-east-1`, `us-east-2`, `us-west-1`,
-`us-west-2`). The master table resides in the same region as the
-distribution itself. This example uses geo restrictions to prevent
-access outside the United States. Basic auth is performed using the
-lambda function
-[cloudfront-basic-auth](https://github.com/techservicesillinois/terraform-aws-cloudfront-lambda-basic-auth).
-which must be deployed separately.
+The username and passwords are stored in a DynamoDB table in the same
+region as the CloudFront distribution itself. DynamoDB replicas are
+deployed in the regions specified (e.g. `us-east-1`, `us-east-2`,
+`us-west-1`, `us-west-2`).
+
+This example uses geo restrictions to prevent access from outside the
+United States. However, regardless of geo restrictions, the Lambda@Edge
+invocation can occasionally take place in regions other than those
+specified if Amazon's algorithms route traffic there. 
+
+Basic auth is performed using the lambda function
+[cloudfront-basic-auth](https://github.com/techservicesillinois/terraform-aws-cloudfront-lambda-basic-auth), which must be deployed separately.
+
+This module version only supports the current [Version 2019.11.21](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables.V2.html) version of
+DynamoDB global tables.
 
 ```hcl
 module "foo" {
   source = "git@github.com:techservicesillinois/terraform-aws-cloudfront-distribution"
 
-  domain = "www.foo.com"
-
-  bucket = "some-S3-bucket"
+  domain                      = "www.foo.com"
+  bucket                      = "some-S3-bucket"
   origin_access_identity_path = "origin-access-identity/cloudfront/QA0DOUCO4WRZ2"
 
   basic_auth = {
@@ -88,8 +93,25 @@ module "foo" {
   }
 
   geo_restriction = {
-    locations = ["US"]
+    locations        = ["US"]
     restriction_type = "whitelist"
+  }
+}
+```
+
+This example deploys DynamoDB replica tables to all supported regions, 
+and does not use geo restrictions.
+
+```hcl
+module "foo" {
+  source = "git@github.com:techservicesillinois/terraform-aws-cloudfront-distribution"
+
+  domain                      = "www.foo.com"
+  bucket                      = "some-S3-bucket"
+  origin_access_identity_path = "origin-access-identity/cloudfront/QA0DOUCO4WRZ2"
+
+  basic_auth = {
+    regions = ["*"]
   }
 }
 ```
@@ -123,17 +145,16 @@ basic_auth
 
 A `basic_auth` block supports the following:
 
-* `regions` - A list of AWS region names where to create DynamoDB tables.
+* `regions` - A list of AWS region names where to create DynamoDB table replicas. A special case is a region list consisting of a single element containing the value "*" means that DynamoDB replica tables are deployed in all supported regions globally.
 * `policy_name` - (Optional) The name of the DynamoDB IAM policy.
 
-If configured the module will create global DynamodDB tables named
-`CloudFront-Basic-Auth-DistributionID` in the regions specified.
-The master table resides in the same region as the CloudFront
-Distribution, and must be included in the list of regions. The
-tables are used to store username and passwords for use with the
+If configured the module will create a DynamodDB table named in a format
+like `CloudFront-Basic-Auth-DistributionID`, with replicas in the regions
+specified.
+
+DynamoDB is used to store username and password pairs used by the
 Lambda@Edge function
-[cloudfront-basic-auth](https://github.com/techservicesillinois/terraform-aws-cloudfront-lambda-basic-auth).
-This function must be deployed separately and is required.
+[cloudfront-basic-auth](https://github.com/techservicesillinois/terraform-aws-cloudfront-lambda-basic-auth) to perform HTTP basic authentication. **NOTE:** The lambda function is required, and is deployed separately.
 
 geo_restriction
 ---------------------------
@@ -147,12 +168,12 @@ content (`whitelist`) or not distribute your content (`blacklist`).
 
 * `restriction_type` - (Required) The method that you want to use
 to restrict distribution of your content by country: `whitelist`,
-or `blacklist`.
+`blacklist`, or `none`.
 
-lambda_function_association
+lambda\_function\_association
 ---------------------------
 
-The lambda_function_association block takes up to four
+The lambda\_function\_association block takes up to four
 [event](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-cloudfront-trigger-events.html)
 blocks. Valid values: `viewer-request`, `origin-request`,
 `viewer-response`, `origin-response`.

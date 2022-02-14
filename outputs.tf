@@ -30,5 +30,13 @@ output "policy_arn" {
 
 output "dynamodb_table_name" {
   description = "DynamoDB table name"
-  value       = module.basic-auth.dynamodb_table != null ? module.basic-auth.dynamodb_table.name : null
+  value       = module.basic-auth.dynamodb_table.name != null ? module.basic-auth.dynamodb_table.name : null
 }
+
+#output "regions" {
+#  value = module.basic-auth.regions
+# }
+#
+#output "replica_regions" {
+# value = module.basic-auth.replica_regions
+#}

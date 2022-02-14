@@ -49,6 +49,7 @@ resource "aws_cloudfront_distribution" "default" {
   default_root_object = "index.html"
   price_class         = "PriceClass_All"
   retain_on_delete    = false
+  tags                = var.tags
 
   logging_config {
     include_cookies = false
