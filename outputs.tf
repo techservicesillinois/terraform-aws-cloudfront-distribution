@@ -25,18 +25,24 @@ output "s3_prefix" {
 
 output "policy_arn" {
   description = "DynamoDB admin policy ARN"
-  value       = module.basic-auth.policy_arn
+  value       = (length(var.basic_auth) > 0) ? module.basic-auth[0].policy_arn : null
 }
 
 output "dynamodb_table_name" {
   description = "DynamoDB table name"
-  value       = module.basic-auth.dynamodb_table.name != null ? module.basic-auth.dynamodb_table.name : null
+  value       = (length(var.basic_auth) > 0) ? module.basic-auth[0].dynamodb_table[0].name : null
 }
 
-#output "regions" {
-#  value = module.basic-auth.regions
-# }
-#
+# Debug output.
+
+#output "known_regions" {
+# description = "Regions that are available and opted-in"
+# value       = (length(var.basic_auth) > 0) ? module.basic-auth[0].known_regions : null
+#}
+
+# Debug output.
+
 #output "replica_regions" {
-# value = module.basic-auth.replica_regions
+# description = "Regions in which DynamoDB replicas are deployed"
+# value       = (length(var.basic_auth) > 0) ? module.basic-auth[0].replica_regions : null
 #}

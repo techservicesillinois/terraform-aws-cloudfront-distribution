@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "default" {
       "dynamodb:UpdateItem",
     ]
 
-    resources = ["arn:aws:dynamodb:${local.region}:${local.account_id}:table/${aws_dynamodb_table.default.name}"]
+    resources = ["arn:aws:dynamodb:${local.region}:${local.account_id}:table/${aws_dynamodb_table.default[0].name}"]
   }
 }
 
@@ -26,7 +26,7 @@ resource "aws_iam_policy" "default" {
   name = var.policy_name
   path = "/"
 
-  description = "Policy for DynamoDB table ${aws_dynamodb_table.default.name}"
+  description = "Policy for DynamoDB table ${aws_dynamodb_table.default[0].name}"
 
   policy = data.aws_iam_policy_document.default[0].json
 }
