@@ -9,6 +9,7 @@ locals {
 }
 
 resource "aws_dynamodb_table" "default" {
+  count            = (length(var.regions) != 0) ? 1 : 0
   name             = var.name
   hash_key         = "username"
   billing_mode     = "PAY_PER_REQUEST"
