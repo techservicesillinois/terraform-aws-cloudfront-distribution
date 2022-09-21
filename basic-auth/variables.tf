@@ -8,7 +8,7 @@ variable "regions" {
 }
 
 variable "tags" {
-  description = "A map of tags to assign to the bucket"
+  description = "Map of tags to assign to resources where supported"
   type        = map(string)
   default     = {}
 }
