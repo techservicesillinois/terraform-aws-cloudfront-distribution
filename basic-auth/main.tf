@@ -26,7 +26,8 @@ resource "aws_dynamodb_table" "default" {
     for_each = toset(local.replica_regions)
 
     content {
-      region_name = replica.value
+      propagate_tags = true
+      region_name    = replica.value
     }
   }
 }

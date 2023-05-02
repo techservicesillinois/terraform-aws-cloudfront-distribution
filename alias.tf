@@ -11,7 +11,7 @@ resource "aws_route53_record" "default" {
 
   # Zone and name of Route53 record being managed.
   zone_id = data.aws_route53_zone.selected[0].zone_id
-  name    = var.hostname
+  name    = try(length(var.hostname) > 0, false) ? var.hostname : var.domain
   type    = "A"
 
   alias {
