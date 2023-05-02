@@ -1,4 +1,5 @@
-# Additional provider needed because certificates reside in us-east-1.
+# Additional provider must be defined because certificates and Lambda@Edge
+# functions must reside in us-east-1.
 
 provider "aws" {
   alias  = "us-east-1"
@@ -20,8 +21,9 @@ data "aws_lambda_function" "selected" {
     for f in local.lambda_function_association : f["name"] => f
   }
 
-  provider = aws.us-east-1
-
   function_name = each.key
   qualifier     = lookup(each.value, "version", null)
+
+  # Lambda@Edge functions must reside in us-east-1.
+  provider = aws.us-east-1
 }
