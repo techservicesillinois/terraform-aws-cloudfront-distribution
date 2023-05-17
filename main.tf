@@ -65,12 +65,11 @@ resource "aws_cloudfront_distribution" "default" {
   retain_on_delete    = false
   tags                = var.tags
 
-  # FIXME: Suppressed due to a permission bug in AWS account provisioning.
-  #  logging_config {
-  #    include_cookies = false
-  #    bucket          = "${local.log_bucket}.s3.amazonaws.com"
-  #    prefix          = "cloudfront/${local.fqdn}/"
-  #  }
+  logging_config {
+    include_cookies = false
+    bucket          = "${local.log_bucket}.s3.amazonaws.com"
+    prefix          = "cloudfront/${local.fqdn}/"
+  }
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
