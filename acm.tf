@@ -17,6 +17,9 @@ data "aws_acm_certificate" "selected" {
 resource "aws_acm_certificate" "default" {
   count = local.create_acm_cert ? 1 : 0
 
+  # ACM certificates for CloudFront distributions must reside in us-east-1.
+  provider = aws.us-east-1
+
   domain_name               = local.fqdn
   subject_alternative_names = var.aliases
   validation_method         = "DNS"
@@ -25,8 +28,7 @@ resource "aws_acm_certificate" "default" {
     create_before_destroy = true
   }
 
-  # ACM certificates for CloudFront distributions must reside in us-east-1.
-  provider = aws.us-east-1
+  tags = var.tags
 }
 
 resource "aws_route53_record" "acm" {
