@@ -5,7 +5,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  replica_regions = (length(var.regions) == 1 && var.regions[0] == "*") ? [for region in local.known_regions : region if region != data.aws_region.current.name] : [for region in local.known_regions : region if contains(var.regions, region) && region != data.aws_region.current.name]
+  replica_regions = (length(var.regions) == 1 && var.regions[0] == "*") ? [for region in local.known_regions : region if region != data.aws_region.current.region] : [for region in local.known_regions : region if contains(var.regions, region) && region != data.aws_region.current.region]
 }
 
 resource "aws_dynamodb_table" "default" {

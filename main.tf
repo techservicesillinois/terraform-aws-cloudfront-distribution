@@ -4,7 +4,7 @@ locals {
   bucket_arn                  = data.aws_s3_bucket.selected.arn
   bucket_name                 = data.aws_s3_bucket.selected.id
   bucket_origin_id            = "S3-${data.aws_s3_bucket.selected.id}"
-  default_log_bucket          = format("uiuc-logs-%s-%s", data.aws_caller_identity.current.account_id, data.aws_region.current.name)
+  default_log_bucket          = format("uiuc-logs-%s-%s", data.aws_caller_identity.current.account_id, data.aws_region.current.region)
   fqdn                        = try(length(var.hostname) > 0, false) ? format("%s.%s", var.hostname, var.domain) : var.domain
   log_bucket                  = var.log_bucket != null ? var.log_bucket : local.default_log_bucket
   origin_access_identity_path = var.origin_access_identity_path
